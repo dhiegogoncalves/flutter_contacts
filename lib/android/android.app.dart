@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_contacts/android/styles.dart';
 
 class AndroidApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -7,10 +8,7 @@ class AndroidApp extends StatelessWidget {
     return MaterialApp(
       title: 'Contacts',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
+      theme: androidTheme(),
       home: Scaffold(),
     );
   }
