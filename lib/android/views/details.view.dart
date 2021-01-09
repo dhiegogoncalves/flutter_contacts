@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_contacts/android/views/address.view.dart';
 import 'package:flutter_contacts/android/views/editor_contact.view.dart';
 import 'package:flutter_contacts/models/contact.model.dart';
 
@@ -124,7 +125,14 @@ class DetailsView extends StatelessWidget {
             ),
             isThreeLine: true,
             trailing: FlatButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AddressView(),
+                  ),
+                );
+              },
               child: Icon(
                 Icons.pin_drop,
                 color: Theme.of(context).primaryColor,
