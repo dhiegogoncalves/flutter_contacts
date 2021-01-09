@@ -22,7 +22,7 @@ class DetailsView extends StatelessWidget {
                   CupertinoPageRoute(
                     builder: (context) => EditorContactView(
                       model: ContactModel(
-                        id: "1",
+                        id: 1,
                         name: "User",
                         email: "email@email.com",
                         phone: "XX XXXXX-XXXX",
