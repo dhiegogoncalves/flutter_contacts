@@ -1,63 +1,53 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/android/views/details.view.dart';
 import 'package:flutter_contacts/android/views/editor_contact.view.dart';
+import 'package:flutter_contacts/android/widgets/contact-list-item.widget.dart';
+import 'package:flutter_contacts/android/widgets/search-appbar.widget.dart';
+import 'package:flutter_contacts/controllers/home.controller.dart';
+import 'package:flutter_contacts/models/contact.model.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 
-class HomeView extends StatelessWidget {
+class HomeView extends StatefulWidget {
+  @override
+  _HomeViewState createState() => _HomeViewState();
+}
+
+class _HomeViewState extends State<HomeView> {
+  final controller = HomeController();
+
+  @override
+  void initState() {
+    controller.search('');
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: Text('Meus Contatos'),
-        centerTitle: true,
-        leading: FlatButton(
-          onPressed: () {},
-          child: Icon(
-            Icons.search,
-            color: Theme.of(context).primaryColor,
-          ),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(kToolbarHeight),
+        child: SearchAppBar(
+          controller: controller,
         ),
       ),
-      body: ListView(
-        children: [
-          ListTile(
-            leading: Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: Colors.blue,
-                borderRadius: BorderRadius.circular(48),
-                /*image: DecorationImage(
-                  image: NetworkImage(),
-                ),*/
-              ),
-            ),
-            title: Text('User'),
-            subtitle: Text('XX XXXXX-XXXX'),
-            trailing: FlatButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => DetailsView(),
-                  ),
-                );
-              },
-              child: Icon(
-                Icons.chat,
-                color: Theme.of(context).primaryColor,
-              ),
-            ),
-          ),
-        ],
+      body: Observer(
+        builder: (_) => ListView.builder(
+          itemCount: controller.contacts.length,
+          itemBuilder: (context, index) {
+            return ContactListItem(
+              model: controller.contacts[index],
+            );
+          },
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => EditorContactView(),
+              builder: (context) => EditorContactView(
+                model: ContactModel(id: 0),
+              ),
             ),
           );
         },
