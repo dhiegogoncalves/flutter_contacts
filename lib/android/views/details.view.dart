@@ -1,8 +1,11 @@
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/android/views/address.view.dart';
+import 'package:flutter_contacts/android/views/crop_picture.view.dart';
 import 'package:flutter_contacts/android/views/editor_contact.view.dart';
 import 'package:flutter_contacts/android/views/home.view.dart';
 import 'package:flutter_contacts/android/views/loading.view.dart';
+import 'package:flutter_contacts/android/views/take_picture.wiew.dart';
 import 'package:flutter_contacts/models/contact.model.dart';
 import 'package:flutter_contacts/repositories/contact.repository.dart';
 import 'package:flutter_contacts/shared/widgets/contact_details_description.widget.dart';
@@ -12,35 +15,36 @@ import 'package:url_launcher/url_launcher.dart';
 class DetailsView extends StatefulWidget {
   final int id;
 
-  DetailsView({@required this.id});
+  DetailsView({
+    @required this.id,
+  });
 
   @override
   _DetailsViewState createState() => _DetailsViewState();
 }
 
 class _DetailsViewState extends State<DetailsView> {
-  final _repository = ContactRepository();
+  final _repository = new ContactRepository();
 
   onDelete() {
     showDialog(
       context: context,
       builder: (ctx) {
         return new AlertDialog(
-          title: new Text("Exclusão de Contato"),
-          content: new Text("Deseja excluir este contato?"),
-          actions: [
-            FlatButton(
-              child: Text("Cancelar"),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-            FlatButton(
-              child: Text("Excluir"),
-              onPressed: delete,
-            ),
-          ],
-        );
+            title: new Text("Exclusão de Contato"),
+            content: new Text("Deseja excluir este contato?"),
+            actions: [
+              FlatButton(
+                child: Text("Cancelar"),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+              FlatButton(
+                child: Text("Excluir"),
+                onPressed: delete,
+              ),
+            ]);
       },
     );
   }
@@ -66,13 +70,48 @@ class _DetailsViewState extends State<DetailsView> {
     print(err);
   }
 
+  takePicture() async {
+    final cameras = await availableCameras();
+    final firstCamera = cameras.first;
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TakePictureView(
+          camera: firstCamera,
+        ),
+      ),
+    ).then((imagePath) {
+      cropPicture(imagePath);
+    });
+  }
+
+  cropPicture(path) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CropPictureView(
+          path: path,
+        ),
+      ),
+    ).then((imagePath) {
+      updateImage(imagePath);
+    });
+  }
+
+  updateImage(path) async {
+    _repository.updateImage(widget.id, path).then((_) {
+      setState(() {});
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
       future: _repository.getContact(widget.id),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          final ContactModel contact = snapshot.data;
+      builder: (ctx, snp) {
+        if (snp.hasData) {
+          ContactModel contact = snp.data;
           return page(context, contact);
         } else {
           return LoadingView();
@@ -81,34 +120,40 @@ class _DetailsViewState extends State<DetailsView> {
     );
   }
 
-  Widget page(BuildContext context, ContactModel contact) {
+  Widget page(BuildContext context, ContactModel model) {
     return Scaffold(
       appBar: AppBar(
+        title: Text("Contato"),
+        centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: Text('Contato'),
-        centerTitle: true,
       ),
       body: Column(
-        children: [
+        children: <Widget>[
           SizedBox(
             height: 10,
             width: double.infinity,
           ),
-          ContactDetailsImage(image: contact.image),
-          SizedBox(height: 10),
-          ContactDetailsDescription(
-            name: contact.name,
-            email: contact.email,
-            phone: contact.phone,
+          ContactDetailsImage(
+            image: model.image,
           ),
-          SizedBox(height: 20),
+          SizedBox(
+            height: 10,
+          ),
+          ContactDetailsDescription(
+            name: model.name,
+            email: model.email,
+            phone: model.phone,
+          ),
+          SizedBox(
+            height: 20,
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
+            children: <Widget>[
               FlatButton(
                 onPressed: () {
-                  launch('tel://${contact.phone}');
+                  launch("tel://${model.phone}");
                 },
                 color: Theme.of(context).primaryColor,
                 shape: CircleBorder(
@@ -121,7 +166,7 @@ class _DetailsViewState extends State<DetailsView> {
               ),
               FlatButton(
                 onPressed: () {
-                  launch('mailto://${contact.email}');
+                  launch("mailto://${model.email}");
                 },
                 color: Theme.of(context).primaryColor,
                 shape: CircleBorder(
@@ -133,7 +178,7 @@ class _DetailsViewState extends State<DetailsView> {
                 ),
               ),
               FlatButton(
-                onPressed: () {},
+                onPressed: takePicture,
                 color: Theme.of(context).primaryColor,
                 shape: CircleBorder(
                   side: BorderSide.none,
@@ -150,22 +195,26 @@ class _DetailsViewState extends State<DetailsView> {
           ),
           ListTile(
             title: Text(
-              'Endereço',
+              "Endereço",
               style: TextStyle(
-                fontSize: 16,
                 fontWeight: FontWeight.w600,
+                fontSize: 16,
               ),
             ),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+              children: <Widget>[
                 Text(
-                  contact.addressLine1 ?? 'Nenhum endereço cadastrado.',
-                  style: TextStyle(fontSize: 12),
+                  model.addressLine1 ?? "Nenhum endereço cadastrado",
+                  style: TextStyle(
+                    fontSize: 12,
+                  ),
                 ),
                 Text(
-                  contact.addressLine2 ?? '',
-                  style: TextStyle(fontSize: 12),
+                  model.addressLine2 ?? "",
+                  style: TextStyle(
+                    fontSize: 12,
+                  ),
                 ),
               ],
             ),
@@ -175,7 +224,9 @@ class _DetailsViewState extends State<DetailsView> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => AddressView(),
+                    builder: (context) => AddressView(
+                        //model: model,
+                        ),
                   ),
                 );
               },
@@ -214,7 +265,9 @@ class _DetailsViewState extends State<DetailsView> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => EditorContactView(model: contact),
+              builder: (context) => EditorContactView(
+                model: model,
+              ),
             ),
           );
         },
