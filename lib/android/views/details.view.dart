@@ -1,16 +1,16 @@
-import 'package:camera/camera.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_contacts/android/views/address.view.dart';
-import 'package:flutter_contacts/android/views/crop_picture.view.dart';
 import 'package:flutter_contacts/android/views/editor_contact.view.dart';
 import 'package:flutter_contacts/android/views/home.view.dart';
 import 'package:flutter_contacts/android/views/loading.view.dart';
-import 'package:flutter_contacts/android/views/take_picture.wiew.dart';
+import 'package:flutter_contacts/android/views/take_picture.view.dart';
+import 'package:flutter_contacts/android/views/crop_picture.view.dart';
 import 'package:flutter_contacts/models/contact.model.dart';
 import 'package:flutter_contacts/repositories/contact.repository.dart';
 import 'package:flutter_contacts/shared/widgets/contact_details_description.widget.dart';
 import 'package:flutter_contacts/shared/widgets/contact_details_image.widget.dart';
+import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:camera/camera.dart';
 
 class DetailsView extends StatefulWidget {
   final int id;
@@ -225,8 +225,8 @@ class _DetailsViewState extends State<DetailsView> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => AddressView(
-                        //model: model,
-                        ),
+                      model: model,
+                    ),
                   ),
                 );
               },

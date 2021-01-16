@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_contacts/android/views/details.view.dart';
 import 'package:flutter_contacts/android/views/editor_contact.view.dart';
 import 'package:flutter_contacts/android/widgets/contact-list-item.widget.dart';
 import 'package:flutter_contacts/android/widgets/search-appbar.widget.dart';
