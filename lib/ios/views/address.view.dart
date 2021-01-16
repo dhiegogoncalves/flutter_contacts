@@ -47,7 +47,7 @@ class AddressView extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: Text(
-                    "Campo Grande/MS",
+                    "Piracicaba/SP",
                     style: TextStyle(
                       fontSize: 12,
                     ),
